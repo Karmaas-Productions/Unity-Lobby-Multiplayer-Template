@@ -8,21 +8,7 @@ on:
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-jobs:
-  installHub:
-    name: Install hub CLI
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install hub CLI
-        run: |
-          curl -fsSL https://github.com/github/hub/releases/latest/download/hub-linux-amd64-2.14.1.tgz | tar xz
-          sudo install -m 755 hub-linux-amd64-2.14.1/bin/hub /usr/local/bin/hub
-
-
-  
+jobs: 
   buildWebGL:
     name: Build for WebGL 🌐
     runs-on: ubuntu-latest
@@ -281,36 +267,17 @@ jobs:
           name: build-iOS
           path: build/iOS
   
-  manageReleases:
-    name: Manage Releases and Tags
-    needs: [buildWindows, buildAndroid, buildiOS, buildLinux, buildmacOS]
+  installHub:
+    name: Install hub CLI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Delete the "Old" release
-      - name: Delete Old Release
+      - name: Install hub CLI
         run: |
-          TAG_NAME="Old"
-          hub release delete $TAG_NAME || true
-
-      # Rename the "Latest" release to "Old"
-      - name: Rename Latest Release
-        run: |
-          OLD_TAG_NAME="Old"
-          NEW_TAG_NAME="Latest"
-          hub release edit -m "$NEW_TAG_NAME" "$OLD_TAG_NAME"
-
-      # Create a new release with the "Latest" tag and upload build artifacts
-      - name: Create Latest Release
-        run: |
-          TAG_NAME="Latest"
-          ASSET_PATH="build/*"
-          hub release create -t "$TAG_NAME"
-          for FILE in $ASSET_PATH; do
-            hub release edit --attach="$FILE" "$TAG_NAME"
-          done
+          curl -fsSL https://github.com/github/hub/releases/latest/download/hub-linux-amd64-2.14.1.tgz | tar xz
+          sudo install -m 755 hub-linux-amd64-2.14.1/bin/hub /usr/local/bin/hub
           
   deployPages:
     needs: buildWebGL
