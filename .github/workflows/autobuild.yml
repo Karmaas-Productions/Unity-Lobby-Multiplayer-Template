@@ -9,6 +9,19 @@ env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
+  installHub:
+    name: Install hub CLI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install hub CLI
+        run: |
+          curl -fsSL https://github.com/github/hub/raw/master/script/get | bash
+          sudo install -m 755 "$(command -v hub)" /usr/local/bin/hub
+
+  
   buildWebGL:
     name: Build for WebGL 🌐
     runs-on: ubuntu-latest
