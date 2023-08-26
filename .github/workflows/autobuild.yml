@@ -212,8 +212,8 @@ jobs:
           path: Library
           key: Library-build-Android
           restore-keys: |
-            Library-build-Android
-            Library-Android
+            Library-build-
+            Library-
 
       - uses: game-ci/unity-builder@v2
         with:
