@@ -312,35 +312,6 @@ jobs:
             curl -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @"$FILE" "$UPLOAD_URL?name=$(basename $FILE)"
           done
-
-  deleteOld:
-    needs:
-      - buildWebGL
-      - buildWindows
-      - buildmacOS
-      - buildLinux
-      - buildAndroid
-      - buildiOS
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-        
-      - name: Delete Release
-        run: |
-          # Get the ID of the release with the "Old" tag
-          RELEASE_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.SECRET }}" "https://api.github.com/repos/${{ github.repository }}/releases/tags/Old" | jq -r '.id')
-          
-          if [ -n "$RELEASE_ID" ]; then
-            # Delete the release
-            curl -X DELETE -H "Authorization: Bearer ${{ secrets.SECRET }}" "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
-            echo "Release with tag 'Old' deleted successfully."
-          else
-            echo "Release with tag 'Old' not found."
-          fi
-        env:
-          SECRET: ${{ secrets.SECRET }}
           
   deployPages:
     needs: buildWebGL
