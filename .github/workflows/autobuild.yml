@@ -347,14 +347,14 @@ jobs:
       - buildAndroid
       - buildiOS
       - deleteOld
-    name: Rename Latest Release to "old"
+    name: Rename Latest Release to "Old"
     runs-on: ubuntu-latest
     steps:
       - name: Rename Latest Release
         uses: irongut/action-edit-release@v1.20
         with:
-          tag_name: old
-          release_name: old
+          tag_name: Old
+          release_name: Old
           draft: false
           prerelease: false
           token: ${{ secrets.RELEASE }}
@@ -375,15 +375,15 @@ jobs:
         
       - name: Delete Release
         run: |
-          # Get the ID of the release with the "old" tag
-          RELEASE_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.SECRET }}" "https://api.github.com/repos/${{ github.repository }}/releases/tags/old" | jq -r '.id')
+          # Get the ID of the release with the "Old" tag
+          RELEASE_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.SECRET }}" "https://api.github.com/repos/${{ github.repository }}/releases/tags/Old" | jq -r '.id')
           
           if [ -n "$RELEASE_ID" ]; then
             # Delete the release
             curl -X DELETE -H "Authorization: Bearer ${{ secrets.SECRET }}" "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
-            echo "Release with tag 'old' deleted successfully."
+            echo "Release with tag 'Old' deleted successfully."
           else
-            echo "Release with tag 'old' not found."
+            echo "Release with tag 'Old' not found."
           fi
         env:
           SECRET: ${{ secrets.SECRET }}
@@ -405,4 +405,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages
-          folder: build/WebGL
+          fOlder: build/WebGL
