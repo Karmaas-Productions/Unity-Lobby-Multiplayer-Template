@@ -277,11 +277,10 @@ jobs:
 
       # Delete existing "Latest" release
       - name: Delete Existing Latest Release
-        uses: softprops/delete-release@v1
-        with:
-          owner: ${{ github.repository_owner }}
-          repo: ${{ github.event.repository.name }}
-          tag: Latest
+        run: |
+          curl -X DELETE \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/Latest"
 
       - name: Create New Release
         id: create_release
