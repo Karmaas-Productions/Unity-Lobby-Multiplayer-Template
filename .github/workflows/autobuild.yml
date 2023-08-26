@@ -297,54 +297,56 @@ jobs:
       - name: Upload WebGL Build
         uses: actions/upload-artifact@v2
         with:
-          name: WebGL
+          name: build-WebGL
           path: build/WebGL
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v2
         with:
-          name: Windows
+          name: build-StandaloneWindows64
           path: build/StandaloneWindows64
 
       - name: Upload macOS Build
         uses: actions/upload-artifact@v2
         with:
-          name: macOS
+          name: build-StandaloneOSX
           path: build/StandaloneOSX
 
       - name: Upload Linux Build
         uses: actions/upload-artifact@v2
         with:
-          name: Linux
+          name: build-StandaloneLinux64
           path: build/StandaloneLinux64
 
       - name: Upload Android Build
         uses: actions/upload-artifact@v2
         with:
-          name: Android
+          name: build-Android
           path: build/Android
 
       - name: Upload iOS Build
         uses: actions/upload-artifact@v2
         with:
-          name: iOS
+          name: build-iOS
           path: build/iOS
           
   deployPages:
-    needs: buildWebGL
-    name: Deploy to Github Pages 🚀
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  needs: buildWebGL
+  name: Deploy to Github Pages 🚀
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - uses: actions/download-artifact@v2
-        with:
-          name: build-WebGL
-          path: build
+    - uses: actions/download-artifact@v2
+      with:
+        name: build-WebGL
+        path: build
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          branch: gh-pages
-          fOlder: build/WebGL
+    - name: Deploy 🚀
+      env:
+        GH_TOKEN: ${{ secrets.PAT }}
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages
+        folder: build/WebGL
