@@ -331,22 +331,22 @@ jobs:
           path: build/iOS
           
   deployPages:
-  needs: buildWebGL
-  name: Deploy to Github Pages 🚀
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    needs: buildWebGL
+    name: Deploy to Github Pages 🚀
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - uses: actions/download-artifact@v2
-      with:
-        name: build-WebGL
-        path: build
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-WebGL
+          path: build
 
-    - name: Deploy 🚀
-      env:
-        GH_TOKEN: ${{ secrets.PAT }}
-      uses: JamesIves/github-pages-deploy-action@4.1.4
-      with:
-        branch: gh-pages
-        folder: build/WebGL
+      - name: Deploy 🚀
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: build/WebGL
