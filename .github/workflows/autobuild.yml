@@ -343,7 +343,7 @@ jobs:
           name: build-WebGL
           path: build
 
-      - name: Deploy 🚀
+      - name: Deploy
         env:
           GH_TOKEN: ${{ secrets.PAT }}
         uses: JamesIves/github-pages-deploy-action@4.1.4
