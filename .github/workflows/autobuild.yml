@@ -18,8 +18,9 @@ jobs:
 
       - name: Install hub CLI
         run: |
-          curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s latest
-          sudo install -m 755 "$(command -v hub)" /usr/local/bin/hub
+          curl -fsSL https://github.com/github/hub/releases/latest/download/hub-linux-amd64-2.14.1.tgz | tar xz
+          sudo install -m 755 hub-linux-amd64-2.14.1/bin/hub /usr/local/bin/hub
+
 
   
   buildWebGL:
