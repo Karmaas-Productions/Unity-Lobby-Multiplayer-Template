@@ -266,52 +266,70 @@ jobs:
         with:
           name: build-iOS
           path: build/iOS
-  
-  manageReleases:
-    name: Manage Releases and Tags
-    needs: [buildWindows, buildAndroid, buildiOS, buildLinux, buildmacOS]
+
+  createReleaseAndUpload:
+    needs: [buildWebGL, buildWindows, buildmacOS, buildLinux, buildAndroid, buildiOS]
+    name: Create Release and Upload Artifacts 🚀
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Delete the "Old" release
-      - name: Delete Old Release
-        run: |
-          TOKEN=${{ secrets.RELEASE }}
-          TAG_NAME="Old"
-          RELEASE_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG_NAME" | jq '.[0].id')
-          if [ -n "$RELEASE_ID" ]; then
-            curl -X DELETE -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
-          fi
+      # Delete existing "Latest" release
+      - name: Delete Existing Latest Release
+        uses: softprops/delete-release@v1
+        with:
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          tag: Latest
 
-      # Rename the "Latest" release to "Old"
-      - name: Rename Latest Release
-        run: |
-          TOKEN=${{ secrets.RELEASE }}
-          OLD_TAG_NAME="Old"
-          NEW_TAG_NAME="Latest"
-          RELEASE_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$NEW_TAG_NAME" | jq '.[0].id')
-          if [ -n "$RELEASE_ID" ]; then
-            curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID" -d "{\"tag_name\":\"$OLD_TAG_NAME\"}"
-          fi
+      - name: Create New Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: Latest
+          release_name: Latest
+          body: Latest Release
+          draft: false
+          prerelease: false
 
-      # Create a new release with the "Latest" tag
-      - name: Create Latest Release
-        run: |
-          TOKEN=${{ secrets.RELEASE }}
-          TAG_NAME="Latest"
-          RESPONSE=$(curl -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/${{ github.repository }}/releases" -d "{\"tag_name\":\"$TAG_NAME\"}")
-          RELEASE_ID=$(echo "$RESPONSE" | jq '.id')
-          if [ -n "$RELEASE_ID" ]; then
-            UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.upload_url' | sed -E 's/\{.*//')
-            for FILE in build/*; do
-              curl -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
-              -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @"$FILE" "$UPLOAD_URL?name=$(basename $FILE)"
-            done
-          fi
+      - name: Upload WebGL Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: WebGL
+          path: build/WebGL
+
+      - name: Upload Windows Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows
+          path: build/StandaloneWindows64
+
+      - name: Upload macOS Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: macOS
+          path: build/StandaloneOSX
+
+      - name: Upload Linux Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux
+          path: build/StandaloneLinux64
+
+      - name: Upload Android Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: Android
+          path: build/Android
+
+      - name: Upload iOS Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: iOS
+          path: build/iOS
           
   deployPages:
     needs: buildWebGL
