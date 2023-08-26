@@ -278,39 +278,24 @@ jobs:
       # Delete the "Old" release
       - name: Delete Old Release
         run: |
-          TOKEN=${{ secrets.GITHUB_TOKEN }}
           TAG_NAME="Old"
-          RELEASE_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG_NAME" | grep -m 1 '"id":' | sed -E 's/.*"id": ([0-9]+),?/\1/')
-          if [ -n "$RELEASE_ID" ]; then
-            curl -X DELETE -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
-          fi
+          hub release delete $TAG_NAME || true
 
       # Rename the "Latest" release to "Old"
       - name: Rename Latest Release
         run: |
-          TOKEN=${{ secrets.GITHUB_TOKEN }}
           OLD_TAG_NAME="Old"
           NEW_TAG_NAME="Latest"
-          RELEASE_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$NEW_TAG_NAME" | grep -m 1 '"id":' | sed -E 's/.*"id": ([0-9]+),?/\1/')
-          if [ -n "$RELEASE_ID" ]; then
-            curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID" -d "{\"tag_name\":\"$OLD_TAG_NAME\"}"
-          fi
+          hub release edit -m "$NEW_TAG_NAME" "$OLD_TAG_NAME"
 
       # Create a new release with the "Latest" tag and upload build artifacts
       - name: Create Latest Release
         run: |
-          TOKEN=${{ secrets.GITHUB_TOKEN }}
           TAG_NAME="Latest"
           ASSET_PATH="build/*"
-          RELEASE_RESPONSE=$(curl -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/${{ github.repository }}/releases" -d "{\"tag_name\":\"$TAG_NAME\"}")
-          RELEASE_ID=$(echo "$RELEASE_RESPONSE" | grep -m 1 '"id":' | sed -E 's/.*"id": ([0-9]+),?/\1/')
-          UPLOAD_URL=$(echo "$RELEASE_RESPONSE" | grep -m 1 '"upload_url":' | sed -E 's/.*"upload_url": "([^"]+){[^}]+}",?/\1/')
+          hub release create -t "$TAG_NAME"
           for FILE in $ASSET_PATH; do
-            UPLOAD_URL="${UPLOAD_URL%\{*}" # Remove template parameters from URL
-            curl -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
-            -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @"$FILE" "$UPLOAD_URL?name=$(basename $FILE)"
+            hub release edit --attach="$FILE" "$TAG_NAME"
           done
           
   deployPages:
