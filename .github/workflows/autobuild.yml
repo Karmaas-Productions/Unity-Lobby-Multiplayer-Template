@@ -280,7 +280,7 @@ jobs:
         run: |
           TOKEN=${{ secrets.RELEASE }}
           TAG_NAME="Old"
-          RELEASE_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG_NAME" | grep -m 1 '"id":' | sed -E 's/.*"id": ([0-9]+),?/\1/')
+          RELEASE_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG_NAME" | jq '.[0].id')
           if [ -n "$RELEASE_ID" ]; then
             curl -X DELETE -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
           fi
@@ -291,7 +291,7 @@ jobs:
           TOKEN=${{ secrets.RELEASE }}
           OLD_TAG_NAME="Old"
           NEW_TAG_NAME="Latest"
-          RELEASE_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$NEW_TAG_NAME" | grep -m 1 '"id":' | sed -E 's/.*"id": ([0-9]+),?/\1/')
+          RELEASE_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$NEW_TAG_NAME" | jq '.[0].id')
           if [ -n "$RELEASE_ID" ]; then
             curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID" -d "{\"tag_name\":\"$OLD_TAG_NAME\"}"
@@ -304,11 +304,10 @@ jobs:
           TAG_NAME="Latest"
           RESPONSE=$(curl -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
           "https://api.github.com/repos/${{ github.repository }}/releases" -d "{\"tag_name\":\"$TAG_NAME\"}")
-          RELEASE_ID=$(echo "$RESPONSE" | grep -m 1 '"id":' | sed -E 's/.*"id": ([0-9]+),?/\1/')
+          RELEASE_ID=$(echo "$RESPONSE" | jq '.id')
           if [ -n "$RELEASE_ID" ]; then
+            UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.upload_url' | sed -E 's/\{.*//')
             for FILE in build/*; do
-              UPLOAD_URL=$(echo "$RESPONSE" | grep -m 1 '"upload_url":' | sed -E 's/.*"upload_url": "([^"]+){[^}]+}",?/\1/')
-              UPLOAD_URL="${UPLOAD_URL%\{*}" # Remove template parameters from URL
               curl -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" \
               -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @"$FILE" "$UPLOAD_URL?name=$(basename $FILE)"
             done
