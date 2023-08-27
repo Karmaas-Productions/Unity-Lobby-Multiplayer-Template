@@ -298,37 +298,37 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build-WebGL
-          path: build/WebGL
+          path: build
 
       - name: Upload Windows Build
         uses: actions/upload-artifact@v2
         with:
           name: build-StandaloneWindows64
-          path: build/StandaloneWindows64
+          path: build
 
       - name: Upload macOS Build
         uses: actions/upload-artifact@v2
         with:
           name: build-StandaloneOSX
-          path: build/StandaloneOSX
+          path: build
 
       - name: Upload Linux Build
         uses: actions/upload-artifact@v2
         with:
           name: build-StandaloneLinux64
-          path: build/StandaloneLinux64
+          path: build
 
       - name: Upload Android Build
         uses: actions/upload-artifact@v2
         with:
           name: build-Android
-          path: build/Android
+          path: build
 
       - name: Upload iOS Build
         uses: actions/upload-artifact@v2
         with:
           name: build-iOS
-          path: build/iOS
+          path: build
           
   deployPages:
     needs: buildWebGL
