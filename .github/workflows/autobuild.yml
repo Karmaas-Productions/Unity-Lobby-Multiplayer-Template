@@ -264,6 +264,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [buildiOS, buildAndroid, buildWindows, buildLinux, buildmacOS]
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -283,13 +284,13 @@ jobs:
           git commit -m "Update Releases folder"
           git push
 
-      - uses: actions/download-artifact@v3
-        with:
-          path: Release
+        - uses: actions/download-artifact@v3
+          with:
+            path: Release
     
-      - name: Display structure of downloaded     files
-      run: ls -R
-      working-directory: Release
+        - name: Display structure of downloaded     files
+        run: ls -R
+        working-directory: Release
 
       - name: Delete Old Release
         uses: cb80/delrel@latest
