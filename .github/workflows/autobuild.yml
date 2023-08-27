@@ -284,11 +284,12 @@ jobs:
           git commit -m "Update Releases folder"
           git push
 
-        - uses: actions/download-artifact@v3
-          with:
-            path: Release
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: Release
     
-        - name: Display structure of downloaded     files
+      - name: Display structure of downloaded     files
         run: ls -R
         working-directory: Release
 
