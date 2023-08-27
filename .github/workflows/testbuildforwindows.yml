@@ -60,11 +60,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Delete Existing Latest Release
-        uses: liudonghua123/delete-release-action@v1
-        with:
-          release_name: 'Latest'
-
       - name: Create New Release
         id: create_release
         uses: actions/create-release@v1
