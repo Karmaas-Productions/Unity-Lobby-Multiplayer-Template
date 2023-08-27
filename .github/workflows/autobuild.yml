@@ -206,15 +206,6 @@ jobs:
           git add .
           git reset --hard
 
-      - name: Restore Library cache
-        uses: actions/cache@v2
-        with:
-          path: Library
-          key: Library-build-Android
-          restore-keys: |
-            Library-build-
-            Library-
-
       - uses: game-ci/unity-builder@v2
         with:
           targetPlatform: Android
