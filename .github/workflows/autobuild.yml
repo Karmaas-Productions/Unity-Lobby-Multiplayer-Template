@@ -260,66 +260,40 @@ jobs:
           path: build/iOS
 
   createReleaseAndUpload:
-    needs: [buildWebGL, buildWindows, buildmacOS, buildLinux, buildAndroid, buildiOS]
-    name: Create Release and Upload Artifacts 🚀
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  needs: [buildWebGL, buildWindows, buildmacOS, buildLinux, buildAndroid, buildiOS]
+  name: Create Release and Upload Artifacts 🚀
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Delete Existing Latest Release
-        run: |
-          curl -X DELETE \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/tags/Latest"
+    - name: Delete Existing Latest Release
+      uses: liudonghua123/delete-release-action@v1
+      with:
+        release_name: 'Latest'
 
-      - name: Create New Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: Latest
-          release_name: Latest
-          body: Latest Release
-          draft: false
-          prerelease: false
+    - name: Create New Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: Latest
+        release_name: Latest
+        body: Latest Release
+        draft: false
+        prerelease: false
 
-      - name: Upload WebGL Build
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-WebGL
-          path: build
-
-      - name: Upload Windows Build
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-StandaloneWindows64
-          path: build
-
-      - name: Upload macOS Build
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-StandaloneOSX
-          path: build
-
-      - name: Upload Linux Build
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-StandaloneLinux64
-          path: build
-
-      - name: Upload Android Build
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-Android
-          path: build
-
-      - name: Upload iOS Build
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-iOS
-          path: build
+    - name: Attach Artifacts to Release
+      run: |
+        curl -X POST "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=WebGL.zip" --data-binary "@build/WebGL.zip" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/zip"
+        curl -X POST "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=Android.zip" --data-binary "@build/Android.zip" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/zip"
+        curl -X POST "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=Windows.zip" --data-binary "@build/StandaloneWindows64.zip" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/zip"
+        curl -X POST "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=macOS.zip" --data-binary "@build/StandaloneOSX.zip" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/zip"
+        curl -X POST "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=Linux.zip" --data-binary "@build/StandaloneLinux64.zip" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/zip"
+        curl -X POST "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets?name=iOS.zip" --data-binary "@build/iOS.zip" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/zip"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
   deployPages:
     needs: buildWebGL
