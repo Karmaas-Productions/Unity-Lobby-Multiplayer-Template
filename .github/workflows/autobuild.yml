@@ -176,7 +176,7 @@ jobs:
         with:
           targetPlatform: StandaloneLinux64
 
-      - uses: actions/uploa-artifact@v2
+      - uses: actions/upload-artifact@v2
         with:
           name: build-StandaloneLinux64
           path: build/StandaloneLinux64
