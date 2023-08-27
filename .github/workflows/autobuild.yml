@@ -278,13 +278,13 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            build/build-StandaloneWindows64
-            build/build-iOS
-            build/build-Android
-            build/StandaloneOSX
-            build/build-StandaloneLinux64
+            build/StandaloneWindows64/build-StandaloneWindows64
+            build/iOS/build-iOS
+            build/Android/build-Android
+            build/StandaloneOSX/StandaloneOSX
+            build/StandaloneLinux64/build-StandaloneLinux64
           tag_name: Latest
-          release_name: Latest
+          name: Latest
           body: Latest Release of the Game
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
