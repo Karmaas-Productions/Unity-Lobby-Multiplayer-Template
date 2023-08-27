@@ -1,4 +1,4 @@
-name: GameCI Template 🎮
+name: Build Game 🎮
 
 on:
   push:
@@ -176,7 +176,7 @@ jobs:
         with:
           targetPlatform: StandaloneLinux64
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/uploa-artifact@v2
         with:
           name: build-StandaloneLinux64
           path: build/StandaloneLinux64
@@ -223,6 +223,7 @@ jobs:
         with:
           name: build-Android
           path: build/Android
+          
 
   buildiOS:
     name: Build for iOS 📱
@@ -275,7 +276,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Delete existing "Latest" release
       - name: Delete Existing Latest Release
         run: |
           curl -X DELETE \
@@ -343,9 +343,9 @@ jobs:
           name: build-WebGL
           path: build
 
-      - name: Deploy
+      - name: Deploy 🚀
         env:
-          GH_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages
