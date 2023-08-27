@@ -282,7 +282,7 @@ jobs:
             build/iOS/build-iOS
             build/Android/build-Android
             build/StandaloneOSX/StandaloneOSX
-            build/StandaloneLinux64/build-StandaloneLinux64
+            Assets/Scripts.meta
           tag_name: Latest
           name: Latest
           body: Latest Release of the Game
