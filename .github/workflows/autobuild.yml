@@ -267,7 +267,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Delete Release 💥
+      - name: Delete Releases folder
+        run: |
+          rm -rf Releases
+
+      - name: Create new Releases folder
+        run: |
+          mkdir Releases
+
+      - name: Commit changes
+        run: |
+          git config --local user.email   "actions@github.com"
+          git config --local user.name "GitHub   Actions"
+          git add -A
+          git commit -m "Update Releases folder"
+          git push
+
+      - uses: actions/download-artifact@v3
+        with:
+          path: Release
+    
+      - name: Display structure of downloaded     files
+      run: ls -R
+      working-directory: Release
+
+      - name: Delete Old Release
         uses: cb80/delrel@latest
         with:
           tag: Latest
@@ -278,11 +302,11 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            build/StandaloneWindows64/build-StandaloneWindows64
-            build/iOS/build-iOS
-            build/Android/build-Android
-            build/StandaloneOSX/StandaloneOSX
-            Assets/Scripts.meta
+            Releases/build-StandaloneWindows64
+            Releases/build-iOS
+            Releases/build-Android
+            Releases/StandaloneOSX
+            Releases/build-Linux
           tag_name: Latest
           name: Latest
           body: Latest Release of the Game
