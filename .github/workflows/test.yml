@@ -58,7 +58,7 @@ jobs:
     - name: Download Artifacts
       uses: actions/download-artifact@v3
       with:
-        path: Release
+        path: Releases
     
     - name: Display structure of downloaded files
       run: ls -R
@@ -75,7 +75,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          Releases/build-StandaloneWindows64
+          home/runner/work/UnityMultiplayerTemplate/UnityMultiplayerTemplate/Releases/build-StandaloneWindows64
           
         tag_name: Latest
         name: Latest
