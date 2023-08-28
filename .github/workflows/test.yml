@@ -76,7 +76,8 @@ jobs:
       with:
         files: |
           Releases/build-StandaloneWindows64
-          tag_name: Latest
+          
+        tag_name: Latest
         name: Latest
         body: Latest Release of the Game
     env:
