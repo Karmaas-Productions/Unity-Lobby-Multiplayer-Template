@@ -62,7 +62,7 @@ jobs:
     
     - name: Display structure of downloaded files
       run: ls -R
-      working-directory: Release
+      working-directory: Releases
 
     - name: Delete Old Release
       uses: cb80/delrel@latest
