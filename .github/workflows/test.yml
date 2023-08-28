@@ -1,0 +1,83 @@
+name: Build Game 🎮
+
+on: workflow_dispatch
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+jobs: 
+  buildWindows:
+    name: Build for Windows 🖥️
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v2
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Git LFS Pull
+        run: |
+          git lfs pull
+          git add .
+          git reset --hard
+
+      - name: Restore Library cache
+        uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-build-StandaloneWindows64
+          restore-keys: |
+            Library-build-
+            Library-
+
+      - uses: game-ci/unity-builder@v2
+        with:
+          targetPlatform: StandaloneWindows64
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-StandaloneWindows64
+          path: build/StandaloneWindows64
+          
+  create_release:
+    name: Create Release 🚀
+    runs-on: ubuntu-latest
+    needs: buildWindows
+    steps:
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: Release
+    
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: Release
+
+    - name: Delete Old Release
+      uses: cb80/delrel@latest
+      with:
+        tag: Latest
+        token: ${{ secrets.PAT }}
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          Releases/build-StandaloneWindows64
+          tag_name: Latest
+        name: Latest
+        body: Latest Release of the Game
+    env:
+         GITHUB_TOKEN: ${{ secrets.PAT }}
