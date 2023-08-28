@@ -262,13 +262,10 @@ jobs:
     needs: [buildiOS, buildAndroid, buildWindows, buildLinux, buildmacOS]
     steps:
 
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Create temporary file in Releases folder
+    - name: Create random file with timestamp in Releases folder
       run: |
-         mkdir -p Releases
-         touch Releases/temp.txt
+        mkdir -p Releases
+        echo "$(date)" > Releases/temp-$(date +%s).txt
 
     - name: Delete Releases folder
       run: |
@@ -276,7 +273,7 @@ jobs:
 
     - name: Create new Releases folder
       run: |
-       mkdir Releases
+        mkdir Releases
 
     - name: Commit changes
       run: |
