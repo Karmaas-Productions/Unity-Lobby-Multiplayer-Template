@@ -1,9 +1,6 @@
 name: Build Game 🎮
 
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -265,55 +262,60 @@ jobs:
     needs: [buildiOS, buildAndroid, buildWindows, buildLinux, buildmacOS]
     steps:
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Delete Releases folder
-        run: |
-          rm -rf Releases
+    - name: Create temporary file in Releases folder
+      run: |
+         mkdir -p Releases
+         touch Releases/temp.txt
 
-      - name: Create new Releases folder
-        run: |
-          mkdir Releases
+    - name: Delete Releases folder
+      run: |
+        rm -rf Releases
 
-      - name: Commit changes
-        run: |
-          git config --local user.email   "actions@github.com"
-          git config --local user.name "GitHub   Actions"
-          git add -A
-          git commit -m "Update Releases folder"
-          git push
+    - name: Create new Releases folder
+      run: |
+       mkdir Releases
 
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: Release
+    - name: Commit changes
+      run: |
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git add -A
+        git commit -m "Update Releases folder"
+        git push
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: Release
     
-      - name: Display structure of downloaded     files
-        run: ls -R
-        working-directory: Release
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: Release
 
-      - name: Delete Old Release
-        uses: cb80/delrel@latest
-        with:
-          tag: Latest
-          token: ${{ secrets.PAT }}
+    - name: Delete Old Release
+      uses: cb80/delrel@latest
+      with:
+        tag: Latest
+        token: ${{ secrets.PAT }}
 
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            Releases/build-StandaloneWindows64
-            Releases/build-iOS
-            Releases/build-Android
-            Releases/StandaloneOSX
-            Releases/build-Linux
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          Releases/build-StandaloneWindows64
+          Releases/build-iOS
+          Releases/build-Android
+          Releases/StandaloneOSX
+          Releases/build-Linux
           tag_name: Latest
-          name: Latest
-          body: Latest Release of the Game
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+        name: Latest
+        body: Latest Release of the Game
+    env:
+         GITHUB_TOKEN: ${{ secrets.PAT }}
           
   deployPages:
     needs: buildWebGL
