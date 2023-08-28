@@ -75,7 +75,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          Releases/build-StandaloneWindows64
+          home/runner/work/UnityMultiplayerTemplate/UnityMultiplayerTemplate/Releases/build-StandaloneWindows64
           
         tag_name: Latest
         name: Latest
